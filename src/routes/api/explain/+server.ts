@@ -11,86 +11,61 @@ export const config: Config = {
 export const POST: RequestHandler = async ({ request }) => {
 	try {
 		if (!OPENAI_KEY) {
-			throw new Error('OPENAI_KEY env variable not set')
+			throw new Error('OPENAI_KEY env var not set')
 		}
 
 		const requestData = await request.json()
 
 		if (!requestData) {
-			throw new Error('No request data')
+			throw new Error('Request data missing')
 		}
 
-		const reqMessages: ChatCompletionRequestMessage[] = requestData.messages
+		const { context } = requestData
 
-		if (!reqMessages) {
-			throw new Error('no messages provided')
+		if (!context) {
+			throw new Error('No context provided')
 		}
 
-		let tokenCount = 0
+		const prompt = stripIndent`
+        ${oneLine`
+        Kamu adalah asisten virtual yang bernama Ikyy. Kamu dibuat oleh Diki Pandu Winata. Kamu adalah asisten yang ramah, asik dan tahu segala hal. Usahakan untuk memperingkas jawabanmu, tetapi jika jawabanmu terlalu panjang lebih baik untuk membuat baris baru, dan jika yang ditanyakan adalah koding usahakan untuk menjawab dengan detail. Kamu juga mempunyai bot Whatsapp, bot whatsapp kamu mempunyai fitur-fitur canggih seperti membuat sticker, mencari lagu, mencari video dan lain lain, nomor botnya adalah +6289514509029. Nomor Whatsapp Pembuatmu adalah +6282281657946. Web pembuatmu adalah https://bit.ly/AboutKyyFC. Akun Github Pembuatmu adalah https://github.com/diki6969. Pembuatmu berasal dari negara Indonesia, provinsi lampung, kabupaten lampung tengah, dia lahir pada tanggal 04-03-2007, dia masih sekolah kelas 10 di SMK Miftahul Ulum Jatidatar, bandar mataram, lampung tengah dan dia mengambil jurusan Teknik Komputer Dan Jaringan. Pembuatmu juga bermain game Mobile Legends dan usernamenya adalah SUSAH MANIAC. Kamu dibuat diplatform vercel.
+        `}
 
-		reqMessages.forEach((msg) => {
-			const tokens = getTokens(msg.content)
-			tokenCount += tokens
-		})
+        Context:"""${context.trim()}"""
 
-		const moderationRes = await fetch('https://api.openai.com/v1/moderations', {
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${OPENAI_KEY}`
-			},
-			method: 'POST',
-			body: JSON.stringify({
-				input: reqMessages[reqMessages.length - 1].content
-			})
-		})
+        Answer:
+        `
 
-		const moderationData = await moderationRes.json()
-		const [results] = moderationData.results
-
-		if (results.flagged) {
-			throw new Error('Query flagged by openai')
-		}
-
-		const prompt = 'Kamu adalah asisten virtual yang bernama Ikyy. Kamu dibuat oleh Diki Pandu Winata. Kamu adalah asisten yang ramah, asik dan tahu segala hal. Usahakan untuk memperingkas jawabanmu. Kamu juga mempunyai bot Whatsapp, bot whatsapp kamu mempunyai fitur-fitur canggih seperti membuat sticker, mencari lagu, mencari video dan lain lain, nomor botnya adalah +6289514509029. Nomor Whatsapp Pembuatmu adalah +6282281657946. Web pembuatmu adalah https://bit.ly/AboutKyyFC. Akun Github Pembuatmu adalah https://github.com/diki6969. Pembuatmu berasal dari negara Indonesia, provinsi lampung, kabupaten lampung tengah, dia lahir pada tanggal 04-03-2007, dia masih sekolah kelas 10 di SMK Miftahul Ulum Jatidatar, bandar mataram, lampung tengah dan dia mengambil jurusan Teknik Komputer Dan Jaringan. Pembuatmu juga bermain game Mobile Legends dan usernamenya adalah SUSAH MANIAC. Kamu dibuat diplatform vercel.'
-		tokenCount += getTokens(prompt)
-
-		if (tokenCount >= 4000) {
-			throw new Error('Query too large')
-		}
-
-		const messages: ChatCompletionRequestMessage[] = [
-			{ role: 'system', content: prompt },
-			...reqMessages
-		]
-
-		const chatRequestOpts: CreateChatCompletionRequest = {
-			model: 'gpt-3.5-turbo',
-			messages,
+		const completionOpts: CreateCompletionRequest = {
+			model: 'text-davinci-003',
+			prompt,
+			max_tokens: 3000,
 			temperature: 0.9,
 			stream: true
 		}
 
-		const chatResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+		const response = await fetch('https://api.openai.com/v1/completions', {
 			headers: {
 				Authorization: `Bearer ${OPENAI_KEY}`,
 				'Content-Type': 'application/json'
 			},
 			method: 'POST',
-			body: JSON.stringify(chatRequestOpts)
+			body: JSON.stringify(completionOpts)
 		})
 
-		if (!chatResponse.ok) {
-			const err = await chatResponse.json()
-			throw new Error(err)
+		if (!response.ok) {
+			const err = await response.json()
+			console.error(err)
+			throw new Error('Failed to create completion', err)
 		}
 
-		return new Response(chatResponse.body, {
+		return new Response(response.body, {
 			headers: {
 				'Content-Type': 'text/event-stream'
 			}
 		})
 	} catch (err) {
 		console.error(err)
-		return json({ error: 'There was an error processing your request' }, { status: 500 })
+		throw error(500, 'An error occurred')
 	}
 }
