@@ -55,7 +55,7 @@
 <h2>Halo, Saya Ikyy<br>Asisten Virtualmu</h2> <form on:submit|preventDefault={()=>
         handleSubmit()}> <label for="context">Silahkan ketikkan pertanyaanmu<br>dikolom dibawah ini:</label> <textarea name="context" rows="5" bind:value={context} />
         <button>Tanyakan</button> <div class="pt-4">
-                <h2>Jawaban:</h2> {#if answer} <p>
+                <h3>Jawaban:</h3> {#if answer} <p>
                         {answer}
                 </p>
                 {/if}
