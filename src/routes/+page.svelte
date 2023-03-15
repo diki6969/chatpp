@@ -52,15 +52,12 @@
 	}
 </script>
 
-<h1>Explain It Like I'm Five</h1>
-<form on:submit|preventDefault={() => handleSubmit()}>
-	<label for="context">Enter the text you want summarized/explained</label>
-	<textarea name="context" rows="5" bind:value={context} />
-	<button>Explain it</button>
-	<div class="pt-4">
-		<h2>Explanation:</h2>
-		{#if answer}
-			<p>{answer}</p>
-		{/if}
-	</div>
+<h1>Halo, Saya Ikyy<br>Asisten Virtual Kamu</h1> <form on:submit|preventDefault={()=>
+        handleSubmit()}> <label for="context">Silahkan ketikkan pertanyaan anda<br>dikolom dibawah ini:</label> <textarea name="context" rows="5" bind:value={context} />
+        <button>Tanyakan</button> <div class="pt-4">
+                <h2>Jawaban:</h2> {#if answer} <p>
+                        {answer}
+                </p>
+                {/if}
+        </div>
 </form>
