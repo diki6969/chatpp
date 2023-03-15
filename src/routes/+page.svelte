@@ -52,8 +52,8 @@
 	}
 </script>
 
-<h1>Halo, Saya Ikyy<br>Asisten Virtual Kamu</h1> <form on:submit|preventDefault={()=>
-        handleSubmit()}> <label for="context">Silahkan ketikkan pertanyaan anda<br>dikolom dibawah ini:</label> <textarea name="context" rows="5" bind:value={context} />
+<h2>Halo, Saya Ikyy<br>Asisten Virtualmu</h2> <form on:submit|preventDefault={()=>
+        handleSubmit()}> <label for="context">Silahkan ketikkan pertanyaanmu<br>dikolom dibawah ini:</label> <textarea name="context" rows="5" bind:value={context} />
         <button>Tanyakan</button> <div class="pt-4">
                 <h2>Jawaban:</h2> {#if answer} <p>
                         {answer}
