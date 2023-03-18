@@ -1,72 +1,38 @@
-/* Import tailwindcss styles */
+/* Write your global styles here, in PostCSS syntax */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Set global styles for html and body */
 html,
 body {
-  @apply h-full;
+	@apply h-full;
 }
 
-/* Set background and text color for body */
 body {
-  @apply bg-gradient-to-br from-purple-900 to-blue-700 text-white;
+	@apply bg-zinc-900 text-zinc-50;
 }
 
-/* Style for button element */
 button {
-  @apply px-4 py-2 font-medium text-lg bg-green-500 text-white rounded-md mt-4 hover:bg-green-600 transform transition-all duration-200 ease-in-out;
+	@apply px-2.5 py-3 font-medium text-lg bg-emerald-400 text-zinc-900 rounded-md mt-4 hover:bg-emerald-500 transition-all duration-200 ease-in-out;
 }
 
-/* Style for label element */
 label {
-  @apply pb-2 text-lg;
+	@apply pb-2 text-lg;
 }
 
-/* Style for textarea element */
 textarea {
-  @apply rounded-md p-3 text-gray-800 bg-gray-200;
+	@apply rounded-md p-3 text-zinc-900;
 }
-
-/* Style for heading 1 */
 h1 {
-  @apply text-5xl font-bold text-white mb-8 text-center tracking-wider animate-pulse;
+	@apply text-5xl font-semibold;
 }
-
-/* Style for heading 2 */
 h2 {
-  @apply text-3xl font-medium pb-1 text-white mb-8 text-center tracking-wide animate-pulse;
+	@apply text-3xl font-medium pb-1;
 }
-
-/* Style for paragraph */
 p {
-  @apply text-lg mb-4 text-gray-300;
+	@apply text-lg;
 }
 
-/* Style for form element */
 form {
-  @apply flex flex-col pt-8 max-w-lg w-full;
-}
-
-/* Animations */
-@keyframes pulse {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
-  }
-
-  50% {
-    transform: scale(1);
-    box-shadow: 0 5px 0 0 rgba(0, 0, 0, 0.2);
-  }
-
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.2);
-  }
-}
-
-.animate-pulse {
-  animation: pulse 2s infinite;
+	@apply flex flex-col pt-8 max-w-lg w-full;
 }
