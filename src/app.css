@@ -62,3 +62,41 @@ form {
   max-width: 36rem;
   width: 100%;
 } 
+
+div.code-box {
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  position: relative;
+}
+
+div.code-box:before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 0.5rem;
+  border: 2px solid;
+  animation: rotate-border 5s linear infinite;
+}
+
+@keyframes rotate-border {
+  0% {
+    border-color: black;
+  }
+  50% {
+    border-color: white;
+  }
+  100% {
+    border-color: black;
+  }
+}
+
+div.code-box h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  padding-bottom: 0.25rem;
+  color: #F9FAFB;
+}
