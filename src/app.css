@@ -43,26 +43,6 @@ h1 {
   color: #F9FAFB;
 }
 
-h2 {
-  font-size: 2rem;
-  font-weight: 500;
-  padding-bottom: 0.25rem;
-  color: #F9FAFB;
-}
-
-p {
-  font-size: 1.125rem;
-  color: #F9FAFB;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  padding-top: 2rem;
-  max-width: 36rem;
-  width: 100%;
-} 
-
 div.code-box {
   border: 2px solid transparent;
   border-radius: 0.5rem;
@@ -100,3 +80,17 @@ div.code-box h2 {
   padding-bottom: 0.25rem;
   color: #F9FAFB;
 }
+
+
+p {
+  font-size: 1.125rem;
+  color: #F9FAFB;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+  max-width: 36rem;
+  width: 100%;
+} 
