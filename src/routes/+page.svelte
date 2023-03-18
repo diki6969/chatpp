@@ -1,63 +1,92 @@
 <script lang="ts">
-	import type { CreateCompletionResponse } from 'openai'
+	import ChatMessage from '$lib/components/ChatMessage.svelte'
+	import type { ChatCompletionRequestMessage } from 'openai'
 	import { SSE } from 'sse.js'
 
-	let context = ''
-	let loading = false
-	let error = false
-	let answer = ''
+	let query: string = ''
+	let answer: string = ''
+	let loading: boolean = false
+	let chatMessages: ChatCompletionRequestMessage[] = []
+	let scrollToDiv: HTMLDivElement
+
+	function scrollToBottom() {
+		setTimeout(function () {
+			scrollToDiv.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
+		}, 100)
+	}
 
 	const handleSubmit = async () => {
 		loading = true
-		error = false
-		answer = ''
+		chatMessages = [...chatMessages, { role: 'user', content: query }]
 
-		const eventSource = new SSE('/api/explain', {
+		const eventSource = new SSE('/api/chat', {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			payload: JSON.stringify({ context })
+			payload: JSON.stringify({ messages: chatMessages })
 		})
 
-		context = ''
+		query = ''
 
-		eventSource.addEventListener('error', (e) => {
-			error = true
-			loading = false
-			alert('Something went wrong!')
-		})
+		eventSource.addEventListener('error', handleError)
 
 		eventSource.addEventListener('message', (e) => {
+			scrollToBottom()
 			try {
 				loading = false
-
 				if (e.data === '[DONE]') {
+					chatMessages = [...chatMessages, { role: 'assistant', content: answer }]
+					answer = ''
 					return
 				}
 
-				const completionResponse: CreateCompletionResponse = JSON.parse(e.data)
+				const completionResponse = JSON.parse(e.data)
+				const [{ delta }] = completionResponse.choices
 
-				const [{ text }] = completionResponse.choices
-
-				answer = (answer ?? '') + text
+				if (delta.content) {
+					answer = (answer ?? '') + delta.content
+				}
 			} catch (err) {
-				error = true
-				loading = false
-				console.error(err)
-				alert('Something went wrong!')
+				handleError(err)
 			}
 		})
-
 		eventSource.stream()
+		scrollToBottom()
+	}
+
+	function handleError<T>(err: T) {
+		loading = false
+		query = ''
+		answer = ''
+		console.error(err)
 	}
 </script>
 
-<h2>Halo, Saya Ikyy<br>Asisten Virtualmu</h2> <form on:submit|preventDefault={()=>
-        handleSubmit()}> <label for="context">Silahkan ketikkan pertanyaanmu<br>dikolom dibawah ini:</label> <textarea name="context" rows="5" bind:value={context} />
-        <button>Tanyakan</button> <div class="pt-4">
-                <p>Jawaban:</p> {#if answer} <p>
-                        {answer}
-                </p>
-                {/if}
-        </div>
-</form>
+<div class="flex flex-col pt-4 w-full px-8 items-center gap-2">
+	<div>
+		<h1 class="text-2xl font-bold w-full text-center">IKYY CHAT BOT</h1>
+		<p class="text-sm italic">Powered By IkyyOFC</p>
+	</div>
+	<div class="h-[500px] w-full bg-gray-900 rounded-md p-4 overflow-y-auto flex flex-col gap-4">
+		<div class="flex flex-col gap-2">
+			<ChatMessage type="assistant" message="Halo saya ikyy, apakah ada yang bisa saya bantu?" />
+			{#each chatMessages as message}
+				<ChatMessage type={message.role} message={message.content} />
+			{/each}
+			{#if answer}
+				<ChatMessage type="assistant" message={answer} />
+			{/if}
+			{#if loading}
+				<ChatMessage type="assistant" message="Loading.." />
+			{/if}
+		</div>
+		<div class="" bind:this={scrollToDiv} />
+	</div>
+	<form
+		class="flex w-full rounded-md gap-4 bg-gray-900 p-4"
+		on:submit|preventDefault={() => handleSubmit()}
+	>
+		<input type="text" class="input input-bordered w-full" bind:value={query} />
+		<button type="submit" class="btn btn-accent"> Kirim </button>
+	</form>
+</div>
